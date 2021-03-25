@@ -9,12 +9,19 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-promise-router": "^4.0.1",
+    "express-validation": "^3.0.8",
     "express-winston": "^4.0.5",
+    "install": "^0.13.0",
     "isomorphic-fetch": "^3.0.0",
+    "npm": "^7.6.3",
+    "opaque-wasm": "file:../opaque-wasm/pkg",
     "winston": "^3.3.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "axios": "^0.21.1"
+  },
   "scripts": {
+    "start": "node main.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
