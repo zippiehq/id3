@@ -6,7 +6,7 @@ import fs from 'fs'
 import winston from 'winston'
 import crypto from 'crypto'
 import expressWinston from 'express-winston'
-import BLS from 'bls-wasm'
+import BLS from '@zippie/bls-wasm'
 
 let publicKey, privateKey
 let logger

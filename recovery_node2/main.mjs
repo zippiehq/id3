@@ -3,12 +3,17 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import Router from 'express-promise-router'
 import fs from 'fs'
+import path from 'path'
 import winston from 'winston'
 import crypto from 'crypto'
 import expressWinston from 'express-winston'
-import BLS from 'bls-wasm'
+import BLS from '@zippie/bls-wasm'
+import toml from 'toml'
 
 let logger
+let k_i
+let k_i_index 
+let k_commits
 
 const app = express()
 const router = new Router()
@@ -30,6 +35,8 @@ app.use(bodyParser.json()) // support json encoded bodies
       HconditionInitialiserGv_v: Buffer.from(HconditionInitialiserGv_v.serialize()).toString('hex'),
     })
     */
+
+
 router.post('/execute', async (req, res) => {
   if (!req.body.precredential) {
     return res.status(500).send({error: 'No precredential'})
@@ -103,10 +110,7 @@ router.post('/execute', async (req, res) => {
   if (!g_kt.verifyBlind(HconditionInitialiserGv_v_kt, HconditionInitialiserGv_v)) {
     return res.status(500).send({error: 'H(condition|initialiser|g*v)*v*k_t is not a sig of H(condition|initialiser|g*v)*v by k_t'})
   }
-
-  const k_i = new BLS.SecretKey()
-  k_i.deserialize(Buffer.from('30f80a85c9f43434b9a3947fe4113488be10ae2070c17f147b84e0d149d61327', 'hex'))
-  //k_i.setByCSPRNG()
+  
   // generate H(x)*v*k_i + H(condition|initialiser)*v_k_i
   const response1 = k_i.blindSign(hx_v, false)
   const response2 = k_i.blindSign(HconditionInitialiser_v, false)
@@ -118,10 +122,18 @@ router.post('/execute', async (req, res) => {
 
 async function init() {
     console.log('STARTING...')
-    BLS.init(BLS.BLS12_381)
+    await BLS.init(BLS.BLS12_381)
+
+    let dist_key = toml.parse(fs.readFileSync(path.join(process.env.HOME, '.drand/groups/dist_key.private')))
+
+    k_i_index = dist_key.Index
+    k_commits = dist_key.Commits
+    k_i = new BLS.SecretKey()
+    k_i.deserialize(Buffer.from(dist_key.Share, 'hex'))
+
     logger = winston.createLogger({
         level: 'info',
-        defaultMeta: { service: 'enclave_oracle' },
+        defaultMeta: { service: 'recovery_node' },
         format: winston.format.combine(winston.format.timestamp(), winston.format.splat(), winston.format.json()),
         transports: [new winston.transports.Console()],
     })
