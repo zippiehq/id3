@@ -1,9 +1,11 @@
 import Router from 'express-promise-router'
-import { validate, Joi } from 'express-validation'
-import { HandleRegistration, HandleLogin } from 'opaque-wasm'
+import ExpressValidation from 'express-validation'
+import Opaque from '@zippie/opaque-wasm/opaque_wasm.js'
 import crypto from 'crypto'
 import fs from 'fs'
 import * as utils from './utils.mjs'
+const { validate, Joi } = ExpressValidation
+const { HandleRegistration, HandleLogin } = Opaque
 
 const server_privatekey = 'c95843d9c67f7ba7f1231af10e1a88dc' // XXX: get this from env?? Use same as BLS??
 

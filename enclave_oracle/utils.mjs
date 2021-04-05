@@ -1,4 +1,4 @@
-import BLS from 'bls-wasm'
+import BLS from '@zippie/bls-wasm'
 import fs from 'fs'
 import crypto from 'crypto'
 

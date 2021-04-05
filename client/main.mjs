@@ -31,7 +31,9 @@ async function init() {
   const g_kt = new BLS.PublicKey()
   g_kt.deserialize(Buffer.from(attestation1_json.publicKey, 'hex'))
 
-  const login = 'test'
+
+  
+  const login = 'test@test.com'
   const password = 'test'
 
   let response1 = await fetch('http://localhost:8099/signup', {

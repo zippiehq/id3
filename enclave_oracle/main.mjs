@@ -8,9 +8,11 @@ import crypto from 'crypto'
 import expressWinston from 'express-winston'
 import BLS from '@zippie/bls-wasm'
 
-import { validate, ValidationError, Joi } from 'express-validation'
+import ExpressValidation  from 'express-validation'
 import opaque from './opaque-login.mjs'
 import * as utils from './utils.mjs'
+
+const { validate, ValidationError, Joi } = ExpressValidation
 
 let logger
 
