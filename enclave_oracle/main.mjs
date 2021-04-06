@@ -10,6 +10,7 @@ import BLS from '@zippie/bls-wasm'
 
 import ExpressValidation  from 'express-validation'
 import opaque from './opaque-login.mjs'
+import webauthn from './webauthn-login.mjs'
 import * as utils from './utils.mjs'
 
 const { validate, ValidationError, Joi } = ExpressValidation
@@ -118,6 +119,7 @@ async function init() {
     
     app.use(router)
     app.use('/opaque', opaque)
+    app.use('/webauthn', webauthn)
 
     app.get('/health', function (req, res) {
       res.send(JSON.stringify({ notdead: true }))
