@@ -123,8 +123,9 @@ router.post('/execute', async (req, res) => {
 async function init() {
     console.log('STARTING...')
     await BLS.init(BLS.BLS12_381)
-
-    let dist_key = toml.parse(fs.readFileSync(path.join(process.env.HOME, '.drand/groups/dist_key.private')))
+    
+    let dist_key_path = process.env.DIST_KEY ? process.env.DIST_KEY : path.join(process.env.HOME, '.drand/groups/dist_key.private')
+    let dist_key = toml.parse(fs.readFileSync(dist_key_path))
 
     k_i_index = dist_key.Index
     k_commits = dist_key.Commits

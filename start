@@ -1,0 +1,9 @@
+#!/bin/sh
+cd enclave_oracle
+APP_LISTEN_PORT=9000 node main.mjs &
+cd ..
+cd recovery_node2
+APP_LISTEN_PORT=8901 node main.mjs &
+DIST_KEY=${HOME}/.drand2/groups/dist_key.private APP_LISTEN_PORT=8902 node main.mjs &
+cd ..
+
