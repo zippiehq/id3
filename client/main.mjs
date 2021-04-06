@@ -164,10 +164,7 @@ async function init() {
   }
 
   const secret = crypto.createHash('sha256').update(json.x).update(original_message.serialize()).update(unblinded_version.serialize()).digest('hex')
-  console.log(secret)
-
-  // XXX verify secret is indeed a sig over (H(x)+H(condition|initialiser) by k_i
-
+  console.log('generated private key: ', secret)
 }
 
 
