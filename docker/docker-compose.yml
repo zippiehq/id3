@@ -1,0 +1,42 @@
+
+version: "3.1"
+
+services:
+  tor:
+    image: goldy/tor-hidden-service:latest
+    links:
+      - drand
+    environment:
+        # Set version 3 on DRAND group
+        DRAND1_TOR_SERVICE_HOSTS: '80:drand:8081'
+
+    # Keep keys in volumes
+    volumes:
+      - ./tor-keys:/var/lib/tor/hidden_service/
+
+    # Set secret for key, use the same name as the service
+    secrets:
+      - drand1
+
+  drand:
+    environment:
+     - DRAND_HOME=/data/drand
+     - DOCKER_DEBUG=1
+    image: drandorg/go-drand:latest
+    volumes:
+       - ./drand-data:/data/drand
+       - ./tor-keys:/data/tor
+       - ./scripts:/scripts
+
+    entrypoint: /scripts/drand-entrypoint.sh
+    command: start --verbose --private-listen 0.0.0.0:8080 --public-listen 0.0.0.0:8081 --tls-disable
+    restart: always
+    hostname: drand
+
+volumes:
+    tor-keys:
+        driver: local
+
+secrets:
+    drand1:
+        file: ./priv.pem
