@@ -2,15 +2,17 @@
 version: "3.1"
 
 services:
-  tor:
+  tor1:
     image: goldy/tor-hidden-service:latest
     links:
-      - drand
+      - drand1
     environment:
-        DRAND1_TOR_SERVICE_HOSTS: '80:drand:8081'
+        DRAND1_TOR_SERVICE_HOSTS: '80:drand1:8080'
         TOR_SOCKS_PORT: 0.0.0.0:8118 OnionTrafficOnly NoDNSRequest NoIPv4Traffic
+        TOR_EXTRA_OPTIONS: |
+           CircuitBuildTimeout 10
 
-    hostname: tor
+    hostname: tor1
     # Keep keys in volumes
     volumes:
       - ./tor-keys:/var/lib/tor/hidden_service/
@@ -19,26 +21,65 @@ services:
     secrets:
       - drand1
 
-  drand:
+  drand1:
     environment:
      - DRAND_HOME=/data/drand
      - DOCKER_DEBUG=1
-     - ALL_PROXY=socks5h://tor:8118
+     - TOR_SERVICE_NAME=drand1
+     - ALL_PROXY=socks5h://tor1:8118
+     - DRAND_ACT_AS_LEADER=1
+     
     image: drandorg/go-drand:latest
     volumes:
-       - ./drand-data:/data/drand
+       - ./drand1-data:/data/drand
        - ./tor-keys:/data/tor
        - ./scripts:/scripts
 
     entrypoint: /scripts/drand-entrypoint.sh
     command: start --verbose --private-listen 0.0.0.0:8080 --public-listen 0.0.0.0:8081 --tls-disable
     restart: always
-    hostname: drand
+    hostname: drand1
 
-volumes:
-    tor-keys:
-        driver: local
+  tor2:
+    image: goldy/tor-hidden-service:latest
+    links:
+      - drand2
+    environment:
+        DRAND2_TOR_SERVICE_HOSTS: '80:drand2:8080'
+        TOR_SOCKS_PORT: 0.0.0.0:8118 OnionTrafficOnly NoDNSRequest NoIPv4Traffic
+        TOR_EXTRA_OPTIONS: |
+           CircuitBuildTimeout 10
+
+    hostname: tor2
+    # Keep keys in volumes
+    volumes:
+      - ./tor-keys:/var/lib/tor/hidden_service/
+
+    # Set secret for key, use the same name as the service
+    secrets:
+      - drand2
+
+  drand2:
+    environment:
+     - DRAND_HOME=/data/drand
+     - DOCKER_DEBUG=1
+     - TOR_SERVICE_NAME=drand2
+     - ALL_PROXY=socks5h://tor2:8118
+     - DRAND_CONNECT_TO=drand1
+     
+    image: drandorg/go-drand:latest
+    volumes:
+       - ./drand2-data:/data/drand
+       - ./tor-keys:/data/tor
+       - ./scripts:/scripts
+
+    entrypoint: /scripts/drand-entrypoint.sh
+    command: start --verbose --private-listen 0.0.0.0:8080 --public-listen 0.0.0.0:8081 --tls-disable
+    restart: always
+    hostname: drand2
 
 secrets:
     drand1:
-        file: ./priv.pem
+        file: ./drand1-priv.pem
+    drand2:
+        file: ./drand2-priv.pem
