@@ -1,0 +1,3 @@
+[submodule "docker/drand"]
+	path = docker/drand
+	url = https://github.com/zippiehq/drand

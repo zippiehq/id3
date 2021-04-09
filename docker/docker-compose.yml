@@ -29,7 +29,7 @@ services:
      - ALL_PROXY=socks5h://tor1:8118
      - DRAND_ACT_AS_LEADER=1
      
-    image: drandorg/go-drand:latest
+    build: drand
     volumes:
        - ./drand1-data:/data/drand
        - ./tor-keys:/data/tor
@@ -67,7 +67,7 @@ services:
      - ALL_PROXY=socks5h://tor2:8118
      - DRAND_CONNECT_TO=drand1
      
-    image: drandorg/go-drand:latest
+    build: drand
     volumes:
        - ./drand2-data:/data/drand
        - ./tor-keys:/data/tor
